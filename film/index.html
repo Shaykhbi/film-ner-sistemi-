@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Film Öneri Sistemi</title>
+  <style>
+    /* Modern Custom Properties */
+    :root {
+      --primary-color: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #a5b4fc;
+      --accent-color: #f43f5e;
+      --accent-dark: #e11d48;
+      --accent-light: #fda4af;
+      --text-color: #334155;
+      --text-light: #64748b;
+      --light-bg: #f8fafc;
+      --card-bg: #ffffff;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      --header-bg: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      --header-text: #ffffff;
+      --footer-bg: #f1f5f9;
+      --footer-text: #64748b;
+      --form-bg: rgba(255, 255, 255, 0.95);
+      --border-radius-sm: 0.375rem;
+      --border-radius-md: 0.5rem;
+      --border-radius-lg: 0.75rem;
+      --border-radius-xl: 1rem;
+      --bg-pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    [data-theme="dark"] {
+      --primary-color: #818cf8;
+      --primary-dark: #6366f1;
+      --primary-light: #c7d2fe;
+      --accent-color: #fb7185;
+      --accent-dark: #f43f5e;
+      --accent-light: #fda4af;
+      --text-color: #e2e8f0;
+      --text-light: #94a3b8;
+      --light-bg: #0f172a;
+      --card-bg: #1e293b;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+      --header-bg: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+      --header-text: #f1f5f9;
+      --footer-bg: #1e293b;
+      --footer-text: #94a3b8;
+      --form-bg: rgba(30, 41, 59, 0.95);
+      --bg-pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23818cf8' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    /* Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--light-bg);
+      background-image: var(--bg-pattern);
+      color: var(--text-color);
+      line-height: 1.7;
+      padding: 0;
+      min-height: 100vh;
+      direction: ltr;
+      transition: var(--transition);
+    }
+
+    body[dir="rtl"] {
+      direction: rtl;
+      text-align: right;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* Header Styles */
+    header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1.5rem 0;
+      margin-bottom: 3rem;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-bg {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      z-index: 0;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* Language Selector */
+    .language-selector select {
+      padding: 0.6rem 2rem 0.6rem 1rem;
+      border-radius: var(--border-radius-lg);
+      background-color: rgba(255, 255, 255, 0.15);
+      color: var(--header-text);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      font-size: 0.875rem;
+      font-weight: 500;
+      appearance: none;
+      backdrop-filter: blur(4px);
+      transition: var(--transition);
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem top 50%;
+      background-size: 0.75rem auto;
+    }
+
+    .language-selector select:hover {
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .language-selector select:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+    }
+
+    body[dir="rtl"] .language-selector select {
+      background-position: left 0.75rem top 50%;
+      padding: 0.6rem 1rem 0.6rem 2rem;
+    }
+
+    /* Switch Toggle for Dark Mode */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 26px;
+      vertical-align: middle;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.2);
+      transition: var(--transition);
+      border-radius: 34px;
+      overflow: hidden;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: var(--transition);
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    input:checked + .slider {
+      background-color: var(--accent-color);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    body[dir="rtl"] input:checked + .slider:before {
+      transform: translateX(-26px);
+    }
+
+    #themeLabel {
+      margin-left: 0.5rem;
+      font-size: 1.25rem;
+      transition: var(--transition);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    body[dir="rtl"] #themeLabel {
+      margin-left: 0;
+      margin-right: 0.5rem;
+    }
+
+    /* Form Container */
+    .form-container {
+      background-color: var(--form-bg);
+      padding: 2.5rem;
+      border-radius: var(--border-radius-lg);
+      max-width: 650px;
+      margin: 0 auto 3rem;
+      box-shadow: var(--shadow-xl);
+      backdrop-filter: blur(8px);
+      animation: fadeIn 0.8s ease;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Form Decorations */
+    .form-decoration {
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+      opacity: 0.08;
+      z-index: 0;
+    }
+
+    .dec-1 {
+      top: -90px;
+      left: -90px;
+      transform: rotate(-15deg);
+    }
+
+    .dec-2 {
+      bottom: -90px;
+      right: -90px;
+      transform: rotate(15deg);
+    }
+
+    #filmForm {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Form Elements */
+    .question {
+      margin-bottom: 1.75rem;
+      position: relative;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--text-color);
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+
+    .question label i {
+      margin-right: 0.5rem;
+      color: var(--primary-color);
+      transition: var(--transition);
+    }
+
+    body[dir="rtl"] .question label i {
+      margin-right: 0;
+      margin-left: 0.5rem;
+    }
+
+    select {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 1px solid rgba(203, 213, 225, 0.5);
+      border-radius: var(--border-radius-md);
+      font-size: 1rem;
+      transition: var(--transition);
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem top 50%;
+      background-size: 0.8rem auto;
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    [data-theme="dark"] select {
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+      border-color: rgba(51, 65, 85, 0.5);
+    }
+
+    body[dir="rtl"] select {
+      background-position: left 1rem top 50%;
+      padding-right: 1rem;
+      padding-left: 2.5rem;
+    }
+
+    select:hover {
+      border-color: var(--primary-light);
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    /* Submit Button */
+    button {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 1rem 1.5rem;
+      border: none;
+      border-radius: var(--border-radius-md);
+      cursor: pointer;
+      width: 100%;
+      font-size: 1.125rem;
+      font-weight: 600;
+      transition: var(--transition);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.025em;
+    }
+
+    button:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.12);
+      transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    button:hover:before {
+      width: 100%;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+    }
+
+    /* Section Titles */
+    h2 {
+      text-align: center;
+      margin: 3rem 0 2rem;
+      color: var(--text-color);
+      font-size: 1.875rem;
+      font-weight: 700;
+      position: relative;
+      display: inline-block;
+      padding-bottom: 0.75rem;
+      left: 50%;
+      transform: translateX(-50%);
+      letter-spacing: -0.025em;
+    }
+
+    h2:after {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(to right, var(--primary-color), var(--primary-light));
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+
+    /* Loading Animation */
+    #loader {
+      display: none;
+      text-align: center;
+      margin: 2.5rem auto;
+    }
+
+    .spinner {
+      border: 4px solid rgba(99, 102, 241, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid var(--primary-color);
+      width: 48px;
+      height: 48px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(1.25rem); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Movie Grid */
+    #moviesContainer {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 2rem;
+      margin-top: 2.5rem;
+      justify-content: center;
+    }
+
+    /* Movie Cards */
+    .movie {
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      transition: var(--transition);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.5s ease;
+      animation-fill-mode: both;
+      border: 1px solid rgba(226, 232, 240, 0.1);
+    }
+
+    .movie:hover {
+      transform: translateY(-0.75rem);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .movie-poster {
+      position: relative;
+      height: 380px;
+      overflow: hidden;
+    }
+
+    .movie img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .movie:hover img {
+      transform: scale(1.05);
+    }
+
+    .movie-rating {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background-color: rgba(0, 0, 0, 0.75);
+      color: white;
+      padding: 0.375rem 0.75rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      backdrop-filter: blur(5px);
+      font-size: 0.875rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    body[dir="rtl"] .movie-rating {
+      right: auto;
+      left: 1rem;
+    }
+
+    .movie-tags {
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.375rem;
+    }
+
+    body[dir="rtl"] .movie-tags {
+      left: auto;
+      right: 1rem;
+    }
+
+    .movie-tag {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 0.25rem 0.625rem;
+      border-radius: var(--border-radius-sm);
+      font-size: 0.75rem;
+      font-weight: 500;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .star-icon {
+      color: #fbbf24;
+      font-size: 1rem;
+    }
+
+    .movie-info {
+      padding: 1.5rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      border-top: 1px solid rgba(226, 232, 240, 0.1);
+    }
+
+    .movie-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+    }
+
+    .movie-date {
+      color: var(--text-light);
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+
+    .movie {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.5s ease;
+      animation-fill-mode: both;
+    }
+
+    .movie:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .movie-poster {
+      position: relative;
+      height: 360px;
+      overflow: hidden;
+    }
+
+    .movie img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: var(--transition);
+    }
+
+    .movie:hover img {
+      transform: scale(1.05);
+    }
+
+    .movie-rating {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    body[dir="rtl"] .movie-rating {
+      right: auto;
+      left: 10px;
+    }
+
+    .movie-tags {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    body[dir="rtl"] .movie-tags {
+      left: auto;
+      right: 10px;
+    }
+
+    .movie-tag {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+
+    .star-icon {
+      color: #ffc107;
+    }
+
+    .movie-info {
+      padding: 16px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .movie-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-color);
+      line-height: 1.4;
+    }
+
+    .movie-date {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+    }
+
+    [data-theme="dark"] .movie-date {
+      color: #aaa;
+    }
+
+    .movie-overview {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 15px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      flex-grow: 1;
+    }
+
+    [data-theme="dark"] .movie-overview {
+      color: #bbb;
+    }
+
+    .movie-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .movie-link {
+      flex: 1;
+      display: block;
+      text-align: center;
+      padding: 8px 0;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+
+    .details-link {
+      background-color: var(--primary-color);
+    }
+
+    .details-link:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .search-link {
+      background-color: var(--accent-color);
+    }
+
+    .search-link:hover {
+      background-color: #e91e63;
+    }
+
+    .no-results {
+      text-align: center;
+      margin: 50px auto;
+      color: #666;
+      font-size: 1.2rem;
+      animation: fadeIn 0.8s ease;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      margin-top: 60px;
+      color: var(--footer-text);
+      background-color: var(--footer-bg);
+      font-size: 0.9rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .footer-wave {
+      position: absolute;
+      top: -20px;
+      left: 0;
+      width: 100%;
+      height: 20px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z' fill='%23f5f5f5' opacity='.25'%3E%3C/path%3E%3Cpath d='M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z' fill='%23f5f5f5' opacity='.5'%3E%3C/path%3E%3Cpath d='M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z' fill='%23f5f5f5' opacity='.75'%3E%3C/path%3E%3C/svg%3E");
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+      
+      .form-container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 1.8rem;
+      }
+      
+      #moviesContainer {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+      }
+      
+      .movie-poster {
+        height: 280px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #moviesContainer {
+        grid-template-columns: 1fr;
+        max-width: 300px;
+        margin: 30px auto;
+      }
+    }
+    
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <h1 id="pageTitle">Film Öneri Sistemi</h1>
+        <div class="header-controls">
+          <div class="language-selector">
+            <select id="pageLang">
+              <option value="tr" selected>Türkçe</option>
+              <option value="en">English</option>
+              <option value="ar">العربية</option>
+            </select>
+          </div>
+          <div class="theme-toggle">
+            <label class="switch" for="themeToggle">
+              <input type="checkbox" id="themeToggle">
+              <span class="slider round"></span>
+            </label>
+            <span id="themeLabel">🌙</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="form-container">
+      <form id="filmForm">
+        <div class="question">
+          <label for="genre">Hangi türde film izlemek istersiniz?</label>
+          <select id="genre" name="genre">
+            <option value="35">Komedi</option>
+            <option value="18">Dram</option>
+            <option value="28">Aksiyon</option>
+            <option value="27">Korku</option>
+            <option value="10749">Romantik</option>
+            <option value="878">Bilim Kurgu</option>
+            <option value="12">Macera</option>
+            <option value="16">Animasyon</option>
+            <option value="53">Gerilim</option>
+            <option value="80">Suç</option>
+          </select>
+        </div>
+
+        <div class="question">
+          <label for="length">Bugün boş vaktiniz ne kadar?</label>
+          <select id="length" name="length">
+            <option value="short">1 saatten az</option>
+            <option value="medium" selected>1-2 saat</option>
+            <option value="long">2 saatten fazla</option>
+          </select>
+        </div>
+
+        <div class="question">
+          <label for="lang">Film dili ne olsun?</label>
+          <select id="lang" name="lang">
+            <option value="tr">Türkçe</option>
+            <option value="en">İngilizce</option>
+            <option value="fr">Fransızca</option>
+            <option value="es">İspanyolca</option>
+            <option value="ja">Japonca</option>
+            <option value="ko">Korece</option>
+          </select>
+        </div>
+
+        <div class="question">
+          <label for="year">Hangi dönemden film izlemek istersiniz?</label>
+          <select id="year" name="year">
+            <option value="all">Fark etmez</option>
+            <option value="new">Son 5 yıl</option>
+            <option value="2010s">2010-2019</option>
+            <option value="2000s">2000-2009</option>
+            <option value="1990s">1990-1999</option>
+            <option value="classic">1990 öncesi</option>
+          </select>
+        </div>
+
+        <div class="question">
+          <label for="certification">Hangi yaş aralığı için film arıyorsunuz?</label>
+          <select id="certification" name="certification">
+            <option value="all">Tüm yaş grupları</option>
+            <option value="G">Genel İzleyici</option>
+            <option value="PG">Ebeveyn Rehberliği Önerilir</option>
+            <option value="PG-13">13 yaş ve üzeri</option>
+            <option value="R">Kısıtlı (17 yaş altı ebeveyn eşliğinde)</option>
+          </select>
+        </div>
+
+        <button type="submit" id="submitBtn">Film Öner!</button>
+      </form>
+    </div>
+
+    <div id="loader">
+      <div class="spinner"></div>
+      <p>Filmler aranıyor...</p>
+    </div>
+
+    <h2 id="resultTitle"></h2>
+    <div id="moviesContainer"></div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>Film Öneri Sistemi &copy; 2025 | TMDB API kullanılarak ve Ahmed , Öczan , Mohamed ve Ömer tarafından geliştirilmiştir.</p>
+    </div>
+  </footer>
+
+  <script>
+   document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('filmForm');
+      const loader = document.getElementById('loader');
+      const resultTitle = document.getElementById('resultTitle');
+      const moviesContainer = document.getElementById('moviesContainer');
+      const themeToggle = document.getElementById('themeToggle');
+      const themeLabel = document.getElementById('themeLabel');
+      const pageLang = document.getElementById('pageLang');
+      const pageTitle = document.getElementById('pageTitle');
+      const submitBtn = document.getElementById('submitBtn');
+      
+      // API anahtarı
+      const apiKey = 'a51969c1e7cf51ef6e62e0afc483f133';
+      
+      // Dil çevirileri
+      const translations = {
+        tr: {
+          pageTitle: "Film Öneri Sistemi",
+          genreLabel: "Hangi türde film izlemek istersiniz?",
+          lengthLabel: "Bugün boş vaktiniz ne kadar?",
+          langLabel: "Film dili ne olsun?",
+          yearLabel: "Hangi dönemden film izlemek istersiniz?",
+          certificationLabel: "Hangi yaş aralığı için film arıyorsunuz?",
+          submitBtn: "Film Öner!",
+          loadingMsg: "Filmler aranıyor...",
+          resultTitle: "Önerilen Filmler:",
+          noResults: "Seçilen kriterlere uygun film bulunamadı. Lütfen farklı seçenekler deneyin.",
+          errorMsg: "Film bilgileri alınırken bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
+          footer: "Film Öneri Sistemi &copy; 2025 | TMDB API kullanılarak ve Ahmed , Öczan , Mohamed ve Ömer tarafından geliştirilmiştir.",
+          detailsLink: "Detaylar",
+          searchLink: "Google'da Ara",
+          short: "1 saatten az",
+          medium: "1-2 saat",
+          long: "2 saatten fazla",
+          all: "Fark etmez",
+          newMovies: "Son 5 yıl",
+          allAges: "Tüm yaş grupları",
+          general: "Genel İzleyici",
+          parentalGuidance: "Ebeveyn Rehberliği Önerilir",
+          teens: "13 yaş ve üzeri",
+          restricted: "Kısıtlı (17 yaş altı ebeveyn eşliğinde)"
+        },
+        en: {
+          pageTitle: "Movie Recommendation System",
+          genreLabel: "What genre of movie would you like to watch?",
+          lengthLabel: "How much free time do you have today?",
+          langLabel: "What language should the movie be in?",
+          yearLabel: "From which period would you like to watch a movie?",
+          certificationLabel: "What age range are you looking for?",
+          submitBtn: "Recommend Movies!",
+          loadingMsg: "Searching for movies...",
+          resultTitle: "Recommended Movies:",
+          noResults: "No movies found matching the selected criteria. Please try different options.",
+          errorMsg: "An error occurred while fetching movie information. Please try again later.",
+          footer: "Movie Recommendation System &copy; 2025 | Developed using TMDB API.",
+          detailsLink: "Details",
+          searchLink: "Search Google",
+          short: "Less than 1 hour",
+          medium: "1-2 hours",
+          long: "More than 2 hours",
+          all: "Any",
+          newMovies: "Last 5 years",
+          allAges: "All age groups",
+          general: "General Audience",
+          parentalGuidance: "Parental Guidance Suggested",
+          teens: "13 years and older",
+          restricted: "Restricted (Under 17 with parent)"
+        },
+        ar: {
+          pageTitle: "نظام توصية الأفلام",
+          genreLabel: "أي نوع من الأفلام ترغب في مشاهدته؟",
+          lengthLabel: "كم من الوقت الحر لديك اليوم؟",
+          langLabel: "ما هي لغة الفيلم المطلوبة؟",
+          yearLabel: "من أي فترة ترغب في مشاهدة فيلم؟",
+          certificationLabel: "ما هي الفئة العمرية التي تبحث عنها؟",
+          submitBtn: "اقترح أفلام!",
+          loadingMsg: "جاري البحث عن الأفلام...",
+          resultTitle: "الأفلام المقترحة:",
+          noResults: "لم يتم العثور على أفلام تطابق المعايير المحددة. يرجى تجربة خيارات مختلفة.",
+          errorMsg: "حدث خطأ أثناء جلب معلومات الفيلم. يرجى المحاولة مرة أخرى لاحقًا.",
+          footer: "نظام توصية الأفلام &copy; 2025 | تم التطوير باستخدام TMDB API.",
+          detailsLink: "التفاصيل",
+          searchLink: "البحث في جوجل",
+          short: "أقل من ساعة",
+          medium: "1-2 ساعة",
+          long: "أكثر من ساعتين",
+          all: "أي",
+          newMovies: "آخر 5 سنوات",
+          allAges: "جميع الفئات العمرية",
+          general: "الجمهور العام",
+          parentalGuidance: "يُقترح إشراف الوالدين",
+          teens: "13 سنة فما فوق",
+          restricted: "مقيد (أقل من 17 عامًا مع الوالدين)"
+        }
+      };
+      
+      // Tema ayarlarını kaydet/yükle
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeToggle.checked = true;
+        themeLabel.textContent = '☀️';
+      }
+      
+      // Dil ayarlarını kaydet/yükle
+      const savedLang = localStorage.getItem('language') || 'tr';
+      pageLang.value = savedLang;
+      updatePageLanguage(savedLang);
+      
+      // Tema değişimi işleyicisi
+      themeToggle.addEventListener('change', function() {
+        if (this.checked) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          themeLabel.textContent = '☀️';
+          localStorage.setItem('theme', 'dark');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'light');
+          themeLabel.textContent = '🌙';
+          localStorage.setItem('theme', 'light');
+        }
+      });
+      
+      // Dil değişimi işleyicisi
+      pageLang.addEventListener('change', function() {
+        const selectedLang = this.value;
+        updatePageLanguage(selectedLang);
+        localStorage.setItem('language', selectedLang);
+      });
+      
+      // Sayfadaki metinleri seçilen dile göre güncelle
+      function updatePageLanguage(lang) {
+        const t = translations[lang];
+        
+        // Başlık ve buton güncelleme
+        pageTitle.textContent = t.pageTitle;
+        submitBtn.textContent = t.submitBtn;
+        document.querySelector('label[for="genre"]').textContent = t.genreLabel;
+        document.querySelector('label[for="length"]').textContent = t.lengthLabel;
+        document.querySelector('label[for="lang"]').textContent = t.langLabel;
+        document.querySelector('label[for="year"]').textContent = t.yearLabel;
+        document.querySelector('label[for="certification"]').textContent = t.certificationLabel;
+        document.querySelector('#loader p').textContent = t.loadingMsg;
+        document.querySelector('footer p').textContent = t.footer;
+        
+        // Select elementlerindeki seçenekleri güncelle
+        const lengthSelect = document.getElementById('length');
+        lengthSelect.options[0].textContent = t.short;
+        lengthSelect.options[1].textContent = t.medium;
+        lengthSelect.options[2].textContent = t.long;
+        
+        const yearSelect = document.getElementById('year');
+        yearSelect.options[0].textContent = t.all;
+        yearSelect.options[1].textContent = t.newMovies;
+        
+        const certSelect = document.getElementById('certification');
+        certSelect.options[0].textContent = t.allAges;
+        certSelect.options[1].textContent = t.general;
+        certSelect.options[2].textContent = t.parentalGuidance;
+        certSelect.options[3].textContent = t.teens;
+        certSelect.options[4].textContent = t.restricted;
+        
+        // Sonuç başlığını güncelle (eğer gösteriliyorsa)
+        if (resultTitle.textContent) {
+          resultTitle.textContent = t.resultTitle;
+        }
+      }
+      
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Form verileri
+        const genre = document.getElementById('genre').value;
+        const lang = document.getElementById('lang').value;
+        const length = document.getElementById('length').value;
+        const yearPeriod = document.getElementById('year').value;
+        const certification = document.getElementById('certification').value;
+        const currentLang = pageLang.value;
+        const t = translations[currentLang];
+        
+        // Sayfa başlığını temizle ve yükleme animasyonunu göster
+        resultTitle.textContent = "";
+        moviesContainer.innerHTML = '';
+        loader.style.display = 'block';
+        
+        // Süre filtresini ayarla
+        let runtimeFilter = '';
+        if (length === 'short') {
+          runtimeFilter = '&with_runtime.lte=60';
+        } else if (length === 'medium') {
+          runtimeFilter = '&with_runtime.gte=60&with_runtime.lte=120';
+        } else if (length === 'long') {
+          runtimeFilter = '&with_runtime.gte=120';
+        }
+        
+        // Yaş sınırlaması filtresini ayarla
+        let certificationFilter = '';
+        if (certification !== 'all') {
+          certificationFilter = `&certification_country=US&certification=${certification}`;
+        }
+        
+        // Yıl filtresini ayarla
+        let yearFilter = '';
+        const currentYear = new Date().getFullYear();
+        
+        if (yearPeriod === 'new') {
+          yearFilter = `&primary_release_date.gte=${currentYear-5}-01-01`;
+        } else if (yearPeriod === '2010s') {
+          yearFilter = '&primary_release_date.gte=2010-01-01&primary_release_date.lte=2019-12-31';
+        } else if (yearPeriod === '2000s') {
+          yearFilter = '&primary_release_date.gte=2000-01-01&primary_release_date.lte=2009-12-31';
+        } else if (yearPeriod === '1990s') {
+          yearFilter = '&primary_release_date.gte=1990-01-01&primary_release_date.lte=1999-12-31';
+        } else if (yearPeriod === 'classic') {
+          yearFilter = '&primary_release_date.lte=1989-12-31';
+        }
+        
+        // Rastgele bir sayfa seç (1-10 arası)
+        const page = Math.floor(Math.random() * 10) + 1;
+        
+        try {
+          // API çağrısı için dil parametresini 'tr' olarak ayarla (İçerik dilini Türkçe olarak iste)
+          const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=${genre}&with_original_language=${lang}${runtimeFilter}${yearFilter}${certificationFilter}&sort_by=popularity.desc&page=${page}&language=tr`;
+          
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error('API isteği başarısız oldu');
+          }
+          
+          const data = await response.json();
+          
+          // Yükleme animasyonunu gizle
+          loader.style.display = 'none';
+          
+          // Sonuçları göster
+          if (data.results && data.results.length > 0) {
+            resultTitle.textContent = t.resultTitle;
+            
+            // En fazla 8 film göster
+            const moviesToShow = data.results.slice(0, 8);
+            
+            moviesToShow.forEach(movie => {
+              // Tarih formatını düzenle
+              let releaseDate = movie.release_date ? formatDate(movie.release_date) : 'Bilinmiyor';
+              
+              // Filmin posterini oluştur
+              const posterPath = movie.poster_path 
+                ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` 
+                : '/api/placeholder/240/360';
+              
+              // Derecelendirmeyi yuvarla
+              const rating = movie.vote_average ? movie.vote_average.toFixed(1) : '?';
+              
+              // Film kartını oluştur
+              const movieElement = document.createElement('div');
+              movieElement.className = 'movie';
+              movieElement.innerHTML = `
+                <div class="movie-poster">
+                  <img src="${posterPath}" alt="${movie.title}" loading="lazy">
+                  <div class="movie-rating">
+                    <span class="star-icon">★</span> ${rating}
+                  </div>
+                </div>
+                <div class="movie-info">
+                  <div class="movie-title">${movie.title}</div>
+                  <div class="movie-date">${releaseDate}</div>
+                  <div class="movie-overview">${movie.overview || 'Bu film için özet bulunmuyor.'}</div>
+                  <div class="movie-actions">
+                    <a href="https://www.themoviedb.org/movie/${movie.id}" target="_blank" class="movie-link details-link">${t.detailsLink}</a>
+                    <a href="https://www.google.com/search?q=${encodeURIComponent(movie.title + ' film')}" target="_blank" class="movie-link search-link">${t.searchLink}</a>
+                  </div>
+                </div>
+              `;
+              
+              moviesContainer.appendChild(movieElement);
+            });
+          } else {
+            // Sonuç bulunamazsa bilgilendirme mesajı göster
+            resultTitle.textContent = "Üzgünüm!";
+            moviesContainer.innerHTML = `<div class="no-results">${t.noResults}</div>`;
+          }
+        } catch (error) {
+          console.error('Hata:', error);
+          loader.style.display = 'none';
+          resultTitle.textContent = "Hata!";
+          moviesContainer.innerHTML = `<div class="no-results">${t.errorMsg}</div>`;
+        }
+      });
+      
+      // Tarih formatını düzenleyen yardımcı fonksiyon
+      function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const date = new Date(dateString);
+        
+        try {
+          return date.toLocaleDateString('tr-TR', options);
+        } catch (error) {
+          return dateString;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
